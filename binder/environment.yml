@@ -1,0 +1,11 @@
+channels:
+- conda-forge
+dependencies:
+- numpy >=1.17
+- scipy>=1.4.1
+- mpi4py>=3.0.0
+- gxx_linux-64
+- make
+- pandas
+- matplotlib
+- notebook >=6.0.3
