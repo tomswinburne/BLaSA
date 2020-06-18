@@ -2,9 +2,6 @@ rule md:
     input:
         "input.json"
     output:
-        "MPIE_Al_JP_REAL_100k_2/E_data",
-        "MPIE_Al_JP_REAL_100k_2/E_data_2",
-        "MPIE_Al_JP_REAL_100k_2/energy_data.csv",
         "analyze/bond_lattice_free_energy.nbconvert.ipynb",
         "analyze/dEnergy_dFreeEnergy.pdf"
     conda:
