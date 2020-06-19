@@ -11,6 +11,7 @@ Execution and analysis of bond lattice dynamics. When using this code, please ci
 - All parameters are in `input.json`. Default parameters are those used in the above publication.
 - Energy units are electron volts, length units are Angstrom.
 
+- `dump_folder` : relative path to the output folder. Will be created if it doesn't exist
 - `workers_per_value` : number of workers assigned to each parameter value. Must factorize total number of cores
 - `md` -> `bins` :  number of histogram bins
 - `md` -> `n` : supercell has `n^3` unit cells
