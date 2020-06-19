@@ -86,7 +86,7 @@ CorrelationType = 2 : += b_para joint dist. for (l,l+7) and (l,l+1)
 CorrelationType > 0 can give quite large files, GB of data in a batch
 """
 
-CorrelationType = 0
+CorrelationType = 2 * input_data["JointHist"]
 
 for ji in np.arange(jl[color],jl[color+1]):
 	am,RT,T = am_RT_T_array[ji]

@@ -20,6 +20,7 @@ Execution and analysis of bond lattice dynamics. When using this code, please ci
 - `am_array`: list of strains to sample. `am=0.01` is 1% tensile strain
 - `t_array`: list of temperatures
 - `RT_array` : list of transverse strength ratios to sample.
+- `JointHist` : 0/1. Turns on recording of joint histograms to investigate bond-bond correlations. Returns three `bins*bins` arrays.
 
 
 # Execution with Snakemake (recommended)
