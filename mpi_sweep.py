@@ -40,7 +40,7 @@ seed = int(1000.0*np.random.uniform())
 
 
 # Histgram properties
-dump_folder = 'MPIE_Al_JP_REAL_100k_2'
+dump_folder = input_data['dump_folder']
 potname = "M"
 if rank==0:
 	os.system("mkdir -p %s" % dump_folder)
