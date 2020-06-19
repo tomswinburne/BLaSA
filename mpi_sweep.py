@@ -1,9 +1,7 @@
-import os
+import os,json
 import numpy as np
-from bond_lattice import bond_lattice
-import json
-from scipy.optimize import minimize
 from mpi4py import MPI
+from bond_lattice import bond_lattice
 
 comm = MPI.COMM_WORLD
 size = comm.Get_size()
