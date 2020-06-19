@@ -34,3 +34,6 @@ conda install -c bioconda -c conda-forge snakemake
 snakemake --use-conda --cores 10
 ```
 where `--cores` is the total number of CPUs. This must be an integer multiple of `workers_per_value`
+
+# Manual execution
+- Instructions can be found [here](ManualInstallation.md)
