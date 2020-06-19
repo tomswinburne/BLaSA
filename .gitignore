@@ -1,0 +1,3 @@
+.snakemake/*
+bond_lattice/*o
+bond_lattice/__pycache__/*
