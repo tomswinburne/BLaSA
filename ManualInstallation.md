@@ -24,5 +24,31 @@ make
 ```
 
 ## Execution
-- Modify parameter arrays in `input.json`
-- Run in parallel with `mpirun -np ${NPROCS} python mpi_sweep.py`. Reminder: If you installed the `bond_lattice` MD code using pip you have to either remove/rename the bond_lattice module in the source directory or copy the `mpi_sweep.py` file and the `input.json` file to a separate directory. Otherwise python tries to load the local module first.
+- Modify parameter arrays in `input.json` as described [here](Readme.md)
+- Copy files to `run` subfolder
+```
+mkdir -p run; cp mpi_sweep.py run; cp input.json run; cd run;
+```
+- If you did *not* install the `bond_lattice` MD code using pip copy the source code also
+```
+cp -R bond_lattice run/
+```
+- Run in parallel
+```
+mpirun -np ${NPROCS} python mpi_sweep.py
+````
+where `NPROCS` is an integer multiple of the `workers_per_value` parameter
+
+## Analysis
+- Run the conversion notebook
+```
+jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=10000 --execute analyze/convert_to_dataframe.ipynb;
+```
+- Load and run the free energy calculations cell-by-cell
+```
+jupyter-notebook analyze/bond_lattice_free_energy.ipynb
+```
+- If code ran with `JointHist=1` then correlation analysis can also be performed with
+```
+jupyter-notebook analyze/bond_lattice_correlation.ipynb
+```

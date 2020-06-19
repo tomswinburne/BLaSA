@@ -11,7 +11,7 @@ Execution and analysis of bond lattice dynamics. When using this code, please ci
 - All parameters are in `input.json`. Default parameters are those used in the above publication.
 - Energy units are electron volts, length units are Angstrom.
 
-- `dump_folder` : relative path to the output folder. Will be created if it doesn't exist
+- `dump_folder` : output data will be stored in `run/dump_folder`, which will be created if required
 - `workers_per_value` : number of workers assigned to each parameter value. Must factorize total number of cores
 - `md` -> `bins` :  number of histogram bins
 - `md` -> `n` : supercell has `n^3` unit cells
@@ -26,7 +26,7 @@ Execution and analysis of bond lattice dynamics. When using this code, please ci
 
 # Execution with Snakemake (recommended)
 - Requires a working [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) package manager
-- Install Snakemake to automate the workflow
+- Install Snakemake workflow manager
 ```
 conda install -c bioconda -c conda-forge snakemake
 ```

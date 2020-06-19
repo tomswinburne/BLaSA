@@ -10,7 +10,7 @@ rule md:
         "pip install .;"
         "mkdir -p run; cp mpi_sweep.py run; cp input.json run; cd run;"
         "mpirun --oversubscribe -np 10 python mpi_sweep.py;"
-        "cd ..; mv run/sample_data .;"
+        "cd ..;"
         "jupyter nbconvert --to notebook"
         "    --ExecutePreprocessor.timeout=10000"
         "    --execute analyze/convert_to_dataframe.ipynb;"
