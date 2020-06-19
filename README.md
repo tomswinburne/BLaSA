@@ -24,7 +24,7 @@ Execution and analysis of bond lattice dynamics. When using this code, please ci
 - `JointHist` : 0/1. Turns on recording of joint histograms to investigate bond-bond correlations. Returns three `bins*bins` arrays.
 
 
-# Execution with Snakemake (recommended)
+# Automated execution and analysis with Snakemake (recommended)
 - Requires a working [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) package manager
 - Install Snakemake workflow manager
 ```
@@ -36,5 +36,5 @@ snakemake --use-conda --cores 10
 ```
 where `--cores` is the total number of CPUs. This must be an integer multiple of `workers_per_value`
 
-# Manual execution
+# Manual execution and analysis
 - Instructions can be found [here](ManualInstallation.md)
