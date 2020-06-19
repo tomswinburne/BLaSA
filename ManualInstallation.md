@@ -27,7 +27,7 @@ make
 - Modify parameter arrays in `input.json` as described [here](Readme.md)
 - Copy files to `run` subfolder
 ```
-mkdir -p run; cp mpi_sweep.py run; cp input.json run; cd run;
+mkdir -p run; cp mpi_sweep.py run; cp input.json run;
 ```
 - If you did *not* install the `bond_lattice` MD code using pip copy the source code also
 ```
@@ -35,6 +35,7 @@ cp -R bond_lattice run/
 ```
 - Run in parallel
 ```
+cd run
 mpirun -np ${NPROCS} python mpi_sweep.py
 ````
 where `NPROCS` is an integer multiple of the `workers_per_value` parameter
