@@ -2,9 +2,6 @@ rule md:
     input:
         "input.json"
     output:
-        "sample_data/E_data",
-        "sample_data/E_data_2",
-        "sample_data/energy_data.csv",
         "analyze/bond_lattice_free_energy.nbconvert.ipynb",
         "analyze/dEnergy_dFreeEnergy.pdf"
     conda:
