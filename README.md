@@ -1,4 +1,4 @@
-# Bond Lattice
+# BoLaS - *Bo*nd *La*ttice *S*ampling for the calculation of crystal phase free energies
 :copyright: TD Swinburne 2020 MIT License swinburne@cinam.univ-mrs.fr
 
 Execution and analysis of bond lattice dynamics. When using this code, please cite
