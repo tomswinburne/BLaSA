@@ -1,4 +1,4 @@
-# BoLaS - _Bo_nd __La__ttice __S__ampling for the calculation of crystal phase free energies
+# BoLaS - **Bo**nd **La**ttice **S**ampling for the calculation of crystal phase free energies
 
 :copyright: TD Swinburne 2020 MIT License swinburne@cinam.univ-mrs.fr
 
