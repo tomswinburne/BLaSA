@@ -1,5 +1,4 @@
-# BoLaS
-**Bo**nd **La**ttice **S**ampling for the calculation of crystal phase free energies
+## BoLaS - **Bo**nd **La**ttice **S**ampling for crystal phase free energies
 
 :copyright: TD Swinburne 2020 MIT License swinburne@cinam.univ-mrs.fr
 
@@ -9,7 +8,7 @@ Execution and analysis of bond lattice dynamics. When using this code, please ci
 > Thomas D Swinburne, Jan Janssen, Mira Todorova, Gideon Simpson,Petr Plechac, Mitchell Luskin and Jörg Neugebauer (submitted)
 
 
-# Setting the parameters
+## Setting the parameters
 - All parameters are in `input.json`. Default parameters are those used in the above publication.
 - Energy units are electron volts, length units are Angstrom.
 
@@ -26,7 +25,7 @@ Execution and analysis of bond lattice dynamics. When using this code, please ci
 - `JointHist` : 0/1. Turns on recording of joint histograms to investigate bond-bond correlations. Returns three `bins*bins` arrays.
 
 
-# Automated execution and analysis with Snakemake (recommended)
+## Automated execution and analysis with Snakemake (recommended)
 - Requires a working [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) package manager
 - Install Snakemake workflow manager
 ```
@@ -38,5 +37,5 @@ snakemake --use-conda --cores 10
 ```
 where `--cores` is the total number of CPUs. This must be an integer multiple of `workers_per_value`
 
-# Manual execution and analysis
+## Manual execution and analysis
 - Instructions can be found [here](ManualInstallation.md)
