@@ -1,4 +1,4 @@
-## BoLaS - **Bo**nd **La**ttice **S**ampling for crystal phase free energies
+## BoLaS - <u>Bo</u>nd **La**ttice **S**ampling for crystal phase free energies
 
 :copyright: TD Swinburne 2020 MIT License swinburne@cinam.univ-mrs.fr
 
