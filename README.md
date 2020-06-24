@@ -1,6 +1,4 @@
 ## BLaSA - Bond Lattice Sampling and Analytical Approximation
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/tomswinburne/BLaSA/master?filepath=analyze)
-
 :copyright: TD Swinburne 2020 MIT License swinburne@cinam.univ-mrs.fr
 
 Execution and analysis of bond lattice dynamics. When using this code, please cite
@@ -25,6 +23,9 @@ Execution and analysis of bond lattice dynamics. When using this code, please ci
 - `RT_array` : list of transverse strength ratios to sample.
 - `JointHist` : 0/1. Turns on recording of joint histograms to investigate bond-bond correlations. Returns three `bins*bins` arrays.
 
+## Cloud-based execution (recommended for generating analytical predictions only)
+- This repository is hosted online using mybinder [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/tomswinburne/BLaSA/master?filepath=analyze)
+- Due to the CPU hour restrictions of this service we do not recommend generating high quality reference data online, only running the notebooks `analyze/*.ipynb`
 
 ## Automated execution and analysis with Snakemake (recommended)
 - Requires a working [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) package manager
