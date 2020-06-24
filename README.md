@@ -1,4 +1,5 @@
 ## BLaSA - Bond Lattice Sampling and Analytical Approximation
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/tomswinburne/BLaSA/master)
 
 :copyright: TD Swinburne 2020 MIT License swinburne@cinam.univ-mrs.fr
 
