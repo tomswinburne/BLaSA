@@ -3,8 +3,9 @@
 
 Execution and analysis of bond lattice dynamics. When using this code, please cite
 
-> *Anharmonic free energy of lattice vibrations from a mean field bond*   
-> Thomas D Swinburne, Jan Janssen, Mira Todorova, Gideon Simpson,Petr Plechac, Mitchell Luskin and Jörg Neugebauer (submitted)
+> *Anharmonic free energy of lattice vibrations in fcc crystals from a mean field bond*   
+> Accepted for publication in PRB Rapid Communications, August 2020
+> Thomas D Swinburne, Jan Janssen, Mira Todorova, Gideon Simpson, Petr Plechac, Mitchell Luskin and Jörg Neugebauer
 
 
 ## Setting the parameters
