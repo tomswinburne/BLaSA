@@ -55,7 +55,7 @@ class bond_lattice:
         if self.CorrelationType==1:
             CH = np.zeros(self.bins*self.bins,np.int32)
         elif self.CorrelationType==2:
-            CH = np.zeros(3*self.bins*self.bins,np.int32)
+            CH = np.zeros(4*self.bins*self.bins,np.int32)
         else:
             CH = np.zeros(1,np.int32)
         V = np.zeros(self.bins+6)

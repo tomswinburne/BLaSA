@@ -3,6 +3,7 @@
 #include <math.h>
 #include <set>
 #include <map>
+#include <cassert>
 #include <random>
 
 /*
@@ -83,7 +84,7 @@ extern "C" {
     }
     std::default_random_engine generator(seed);
     std::normal_distribution<double> eta(0.0,1.0);
-    int i,t,j,ni,nnc=6;
+    int i,t,j,ni,nnc=8;
     if(fcc) nnc = 12;
     int niv[3*nnc];
     double nnv[3*nnc],dp;
@@ -92,36 +93,72 @@ extern "C" {
       nnv[k]=0.0;
     }
 
-    int blc[nnc],blp[4*nnc]; // for correlations
-
+    int blc[nnc],blp[2*(3+int(fcc))*nnc]; // for correlations
+    for(i=0;i<2*(3+int(fcc))*nnc;i++) blp[i]=0;
 
     double a = a0*am; // target lattice constant
+    double cth=0.5;
 
     if(!fcc) {
-      // simple cubic- only nn interactions
-      // 100
-      niv[3*0+0] = +1;  niv[3*0+1] = +0;   niv[3*0+2] = +0;
-      nnv[3*0+0] = a;  nnv[3*0+1] = 0.0;  nnv[3*0+2] = 0.0;
+          cth = 1.0/3.0;
+          a *= 2.0/sqrt(3.);
+          // [-111]/2 = 100
+          niv[3*0+0] = +1;  niv[3*0+1] = +0;   niv[3*0+2] = +0;
+          nnv[3*0+0] = -a/2.0;  nnv[3*0+1] = +a/2.0;  nnv[3*0+2] = +a/2.0;
 
-      // -100
-      niv[3*1+0] = -1;  niv[3*1+1] = +0;  niv[3*1+2] = +0;
-      nnv[3*1+0] = -a; nnv[3*1+1] = 0.0; nnv[3*1+2] = 0.0;
+          // [1-1-1]/2 = -100
+          niv[3*1+0] = -1;      niv[3*1+1] = +0;      niv[3*1+2] = +0;
+          nnv[3*1+0] = +a/2.0;  nnv[3*1+1] = -a/2.0;  nnv[3*1+2] = -a/2.0;
 
-      // 010
-      niv[3*2+0] = +0;  niv[3*2+1] = +1;   niv[3*2+2] = +0;
-      nnv[3*2+0] = 0.0; nnv[3*2+1] = a;   nnv[3*2+2] = 0.0;
+          // [1-11]/2 = 010
+          niv[3*2+0] = +0;     niv[3*2+1] = +1;       niv[3*2+2] = +0;
+          nnv[3*2+0] = +a/2.0; nnv[3*2+1] = -a/2.0;   nnv[3*2+2] = +a/2.0;
 
-      // -010
-      niv[3*3+0] = +0;  niv[3*3+1] = -1;  niv[3*3+2] = +0;
-      nnv[3*3+0] = 0.0; nnv[3*3+1] = -a; nnv[3*3+2] = 0.0;
+          // [-11-1]/2 = 0-10
+          niv[3*3+0] = +0;      niv[3*3+1] = -1;      niv[3*3+2] = +0;
+          nnv[3*3+0] = -a/2.0;  nnv[3*3+1] = +a/2.0;  nnv[3*3+2] = -a/2.0;
 
-      // 001
-      niv[3*4+0] = +0;  niv[3*4+1] = +0;  niv[3*4+2] = +1;
-      nnv[3*4+0] = 0.0; nnv[3*4+1] = 0.0; nnv[3*4+2] = a;
+          // [11-1]/2 = 001
+          niv[3*4+0] = +0;      niv[3*4+1] = +0;      niv[3*4+2] = +1;
+          nnv[3*4+0] = +a/2.0;  nnv[3*4+1] = +a/2.0;  nnv[3*4+2] = -a/2.0;
 
-      // -001
-      niv[3*5+0] = +0;  niv[3*5+1] = +0;  niv[3*5+2] = -1;
-      nnv[3*5+0] = 0.0; nnv[3*5+1] = 0.0; nnv[3*5+2] = -a;
+          // [-1-11]/2 = -001
+          niv[3*5+0] = +0;      niv[3*5+1] = +0;      niv[3*5+2] = -1;
+          nnv[3*5+0] = -a/2.0;  nnv[3*5+1] = -a/2.0;  nnv[3*5+2] = +a/2.0;
+
+          // [111]/2 = -111 + 1-11 + 11-1 = 1 1 1
+          niv[3*6+0] = +1;      niv[3*6+1] = +1;      niv[3*6+2] = +1;
+          nnv[3*6+0] = +a/2.0;  nnv[3*6+1] = +a/2.0;  nnv[3*6+2] = +a/2.0;
+
+          // -[111]/2 = 1-1-1 + -11-1 + -1-11 = -1 -1 -1
+          niv[3*7+0] = -1;      niv[3*7+1] = -1;      niv[3*7+2] = -1;
+          nnv[3*7+0] = -a/2.0;  nnv[3*7+1] = -a/2.0;  nnv[3*7+2] = -a/2.0;
+          a *= sqrt(3.)/2.0;
+          /*
+          // [100] = [1-1-1]/2 + [111]/2 = 0 1 1
+          niv[3*8+0] = +0;  niv[3*8+1] =  +1;  niv[3*8+2] =  +1;
+          nnv[3*8+0] = +a;  nnv[3*8+1] = 0.0;  nnv[3*8+2] = 0.0;
+
+          // [-100] = -[1-1-1]/2 - [111]/2 = 0 -1 -1
+          niv[3*9+0] = +0;  niv[3*9+1] =  -1;  niv[3*9+2] =  -1;
+          nnv[3*9+0] = -a;  nnv[3*9+1] = 0.0;  nnv[3*9+2] = 0.0;
+
+          // [010] = [-11-1]/2 + [111]/2 = 1 0 1
+          niv[3*10+0] =  +1;  niv[3*10+1] =  +0;  niv[3*10+2] =  +1;
+          nnv[3*10+0] = 0.0;  nnv[3*10+1] =  +a;  nnv[3*10+2] = 0.0;
+
+          // [-100] = -[-11-1]/2 - [111]/2 = -1 0 -1
+          niv[3*11+0] = -1;   niv[3*11+1] =  +0;  niv[3*11+2] =  -1;
+          nnv[3*11+0] = 0.0;  nnv[3*11+1] = -a;   nnv[3*11+2] = 0.0;
+
+          // [001] = [-1-11]/2 + [111]/2 = 1 1 0
+          niv[3*12+0] =  +1;  niv[3*12+1] =  +1;  niv[3*12+2] =  +0;
+          nnv[3*12+0] = 0.0;  nnv[3*12+1] =  0.0;  nnv[3*12+2] = +a;
+
+          // [00-1] = -[1-1-1]/2 - [111]/2 = -1 -1 0
+          niv[3*13+0] = -1;   niv[3*13+1] =  -1;  niv[3*13+2] =  +0;
+          nnv[3*13+0] = 0.0;  nnv[3*13+1] = 0.0;   nnv[3*13+2] = -a;
+          */
     } else {
       a *= sqrt(2.0); // a -> a'
       // fcc x,y,z =  a'/2[110],a'/2[011],a'/2[101] , a' = a*sqrt(2)
@@ -179,12 +216,23 @@ extern "C" {
           dp = nnv[3*i+0]*nnv[3*j+0]/a/a;
           dp += nnv[3*i+1]*nnv[3*j+1]/a/a;
           dp += nnv[3*i+2]*nnv[3*j+2]/a/a;
-          if(dp>0.49 && dp<0.51) {
-            blp[4*i+t] = j;
+          if(std::fabs(dp-cth)<0.01) {
+            std::cout<<"H "<<i<<" "<<j<<" "<<dp<<std::endl;
+            blp[2*(3+int(fcc))*i+t]=j;
             t++;
           }
-          if(t==4) break;
         }
+        for(j=0;j<nnc;j++) {
+          dp = nnv[3*i+0]*nnv[3*j+0]/a/a;
+          dp += nnv[3*i+1]*nnv[3*j+1]/a/a;
+          dp += nnv[3*i+2]*nnv[3*j+2]/a/a;
+          if(std::fabs(dp+cth)<0.01) {
+            std::cout<<"H "<<i<<" "<<j<<" "<<dp<<std::endl;
+            blp[2*(3+int(fcc))*i+t]=j;
+            t++;
+          }
+        }
+
       }
     }
 
@@ -197,8 +245,9 @@ extern "C" {
     for(i=0;i<bins;i++) {
       for(j=0;j<4;j++) H[i+j*bins] = 0;
       if(CorrelationType>0) // 1: bl_0,bt_0, 2: bl_0,bt_0,bl_0,bl_6, bl_0,bl_1
-        for(j=0;j<bins*(1+2*(CorrelationType-1));j++)
+        for(j=0;j<bins*(1+3*(CorrelationType-1));j++)
           CH[i*bins+j] = 0;
+
       r[i] = min_r+i*(max_r-min_r)/bins;
       V[i] = energy(D,AL,a0,r[i]+dr);
     }
@@ -316,19 +365,30 @@ extern "C" {
           }
           mf = std::max(mf,fabs(fm));
         }
+
         if(CorrelationType>1) {
+
           // l=m, l=m+7 correlation, i.e. innerproduct -> -a^2
           for(j=0;j<nnc/2;j++) if(blc[2*j]>=0 && blc[2*j+1]>=0) {
             CH[bins*blc[2*j]+blc[2*j+1]+bins*bins]++;
             CH[bins*blc[2*j+1]+blc[2*j]+bins*bins]++;
           }
+
+
           // all nnv whose inner product -> a^2/2
-          for(j=0;j<nnc;j++) for(ib4=0;ib4<4;ib4++)
-            if(blc[j]>=0 && blc[blp[4*j+ib4]]>=0) {
-              CH[blc[blp[4*j+ib4]]+bins*blc[j]+2*bins*bins]++;
-              CH[bins*blc[blp[4*j+ib4]]+blc[j]+2*bins*bins]++;
+          for(j=0;j<nnc;j++) for(ib4=0;ib4<(3+int(fcc));ib4++)
+            if(blc[j]>=0 && blc[blp[2*(3+int(fcc))*j+ib4]]>=0) {
+              CH[blc[blp[2*(3+int(fcc))*j+ib4]]+bins*blc[j]+2*bins*bins]++;
+              CH[bins*blc[blp[2*(3+int(fcc))*j+ib4]]+blc[j]+2*bins*bins]++;
             }
-         }
+          for(j=0;j<nnc;j++) for(ib4=(3+int(fcc));ib4<2*(3+int(fcc));ib4++)
+            if(blc[j]>=0 && blc[blp[2*(3+int(fcc))*j+ib4]]>=0) {
+              CH[blc[blp[2*(3+int(fcc))*j+ib4]]+bins*blc[j]+3*bins*bins]++;
+              CH[bins*blc[blp[2*(3+int(fcc))*j+ib4]]+blc[j]+3*bins*bins]++;
+            }
+
+        }
+
       }
       if(ig*mf>0.01*a) correction_count++;
       for(i=0;i<N*N*N;i++) for(j=0;j<3;j++) {
@@ -338,6 +398,8 @@ extern "C" {
       }
       // if(rank==0 && (t-ttherm)%1000==0) std::cout<<t/1000<<"k/"<<(tsample+ttherm)/1000<<"k"<<" tsample="<<(t>ttherm)<<std::endl;
     }
+
+
     cc=0; for(i=0;i<bins;i++) cc += H[i];
     if(rank==0) {
       std::cout<<"Histgram Captured "<<int(cc)<<"/"<<tsample*N*N*N*nnc<<" Bond Values ; "<<blmin<<"< b_ll <"<<blmax<<std::endl;

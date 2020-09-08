@@ -1,4 +1,4 @@
-import os,json
+import os,json,faulthandler
 import numpy as np
 from mpi4py import MPI
 from bond_lattice import bond_lattice
@@ -88,7 +88,7 @@ CorrelationType = 2 * input_data["JointHist"]
 
 for ji in np.arange(jl[color],jl[color+1]):
 	am,RT,T = am_RT_T_array[ji]
-	sim_pbc = bond_lattice(a0=a0,D=D0,AL=AL,RT=RT,N=N,fcc=True,CorrelationType=CorrelationType,\
+	sim_pbc = bond_lattice(a0=a0,D=D0,AL=AL,RT=RT,N=N,fcc=False,CorrelationType=CorrelationType,\
 			min_r=rlim[0],max_r=rlim[1],\
 			bins=bins,am=1.0,steps=STEPS,therm_steps=THERM,seed=seed+rank,rank=rank,\
 			CentralForce=False)
@@ -125,13 +125,11 @@ for ji in np.arange(jl[color],jl[color+1]):
 
 		equ = 1.5*kb
 
-		"""
 		print("pre T:\n",T,"Teq:",meanstdU[:2].sum()/equ,"Tvir",meanstdU[2]/kb,end="| ")
 		print("Teq:",meanstdU[6:8].sum()/equ,"Tvir",meanstdU[8]/kb)
 
 		print("post T:\n",T,"Teq:",meanstdU[3:5].sum()/equ,"Tvir",meanstdU[5]/kb)
 		print("Teq:",meanstdU[9:11].sum()/equ,"Tvir",meanstdU[11]/kb)
-		"""
 
 		for ss in [0,3,6,9]:
 			meanstdU[ss:ss+2] /= equ
