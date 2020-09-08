@@ -1,20 +1,20 @@
 {
     "dump_folder" : "sample_data",
-    "workers_per_value": 10,
+    "workers_per_value": 1,
     "md": {
         "bins": 4501,
-        "n": 12,
-        "therm": 50000,
-        "steps": 50000
+        "n": 8,
+        "therm": 5000,
+        "steps": 5000
     },
     "potential": {
         "D0": 0.1,
         "a0": 2.856,
-        "AL": 1.5,
+        "AL": 0.75,
         "r_min": 0.0,
         "r_max": 7.4
     },
-    "am_array": [1.0, 1.04],
+    "strain_array": [0.0, 2.0],
     "t_array": [100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0],
     "RT_array": [0.0, 0.2],
     "JointHist": 0

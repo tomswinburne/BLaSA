@@ -71,22 +71,22 @@ double force(double d, double al, double rt, double a0, double blm, double btm, 
 
 extern "C" {
 
-  void simpos3D(double a0, double am, int N, double AL, double D, double RT, double T,
-    double min_r, double max_r, int bins, int *H, double *V, int *CH,
-    double *r, unsigned seed, int tsample, int ttherm, int rank, bool fcc,
-    int CorrelationType, bool CentralForce) {
-    if(rank==0) {
-        std::cout<<"MORSE LATTICE SYMM:\n";
-        std::cout<<"FCC: "<<fcc<<"\nCentralForce: "<<CentralForce<<"\n";
-        std::cout<<"kT/[Energy]: "<<T<<"\na/a0:"<<am<<"\n";
-        std::cout<<"CorrelationType: "<<CorrelationType<<std::endl;
-    }
+  void bond_lattice_sim(double a0, double epsilon, double T,
+    int N, double AL, double D, double RT, bool CentralForce,
+    double min_r, double max_r, int bins, int CorrelationType, double CorrelationTarget,
+    int *H, double *V, int *CH,
+    double *r, unsigned seed, int tsample, int ttherm, int rank, bool fcc) {
+
     std::default_random_engine generator(seed);
     std::normal_distribution<double> eta(0.0,1.0);
-    int i,t,j,ni,nnc=6;
+
+    int i,t,j,ni,nnc=14;
+
     if(fcc) nnc = 12;
+
     int niv[3*nnc];
-    double nnv[3*nnc],dp;
+
+    double nnv[3*nnc],dp,nm[nnc];
     for(int k=0;k<nnc*3;k++) {
       niv[k]=0;
       nnv[k]=0.0;
@@ -94,81 +94,149 @@ extern "C" {
 
     int blc[nnc],blp[4*nnc]; // for correlations
 
+    double sc = 1.0 + epsilon;
+    double a = a0*sc; // target lattice constant
 
-    double a = a0*am; // target lattice constant
+    if(rank==0) {
+        std::cout<<"MORSE LATTICE SYMM:\n";
+        std::cout<<"FCC: "<<fcc<<"\nCentralForce: "<<CentralForce<<"\n";
+        std::cout<<"kT/[Energy]: "<<T<<"\na/a0:"<<sc<<"\n";
+        std::cout<<"CorrelationType: "<<CorrelationType<<std::endl;
+    }
 
     if(!fcc) {
-      // simple cubic- only nn interactions
-      // 100
+
+      // [-111]/2 = 100
       niv[3*0+0] = +1;  niv[3*0+1] = +0;   niv[3*0+2] = +0;
-      nnv[3*0+0] = a;  nnv[3*0+1] = 0.0;  nnv[3*0+2] = 0.0;
+      nnv[3*0+0] = -a/2.0;  nnv[3*0+1] = +a/2.0;  nnv[3*0+2] = +a/2.0;
+      nm[0] = sqrt(.75)*a;
 
-      // -100
+      // [1-1-1]/2 = -100
       niv[3*1+0] = -1;  niv[3*1+1] = +0;  niv[3*1+2] = +0;
-      nnv[3*1+0] = -a; nnv[3*1+1] = 0.0; nnv[3*1+2] = 0.0;
+      nnv[3*1+0] = +a/2.0;  nnv[3*1+1] = -a/2.0;  nnv[3*1+2] = -a/2.0;
+      nm[1] = sqrt(.75)*a;
 
-      // 010
+      // [1-11]/2 = 010
       niv[3*2+0] = +0;  niv[3*2+1] = +1;   niv[3*2+2] = +0;
-      nnv[3*2+0] = 0.0; nnv[3*2+1] = a;   nnv[3*2+2] = 0.0;
+      nnv[3*2+0] = +a/2.0; nnv[3*2+1] = -a/2.0;   nnv[3*2+2] = +a/2.0;
+      nm[2] = sqrt(.75)*a;
 
-      // -010
+      // [-11-1]/2 = 0-10
       niv[3*3+0] = +0;  niv[3*3+1] = -1;  niv[3*3+2] = +0;
-      nnv[3*3+0] = 0.0; nnv[3*3+1] = -a; nnv[3*3+2] = 0.0;
+      nnv[3*3+0] = -a/2.0;  nnv[3*3+1] = +a/2.0;  nnv[3*3+2] = -a/2.0;
+      nm[3] = sqrt(.75)*a;
 
-      // 001
+      // [11-1]/2 = 001
       niv[3*4+0] = +0;  niv[3*4+1] = +0;  niv[3*4+2] = +1;
-      nnv[3*4+0] = 0.0; nnv[3*4+1] = 0.0; nnv[3*4+2] = a;
+      nnv[3*4+0] = +a/2.0; nnv[3*4+1] = +a/2.0; nnv[3*4+2] = -a/2.0;
+      nm[4] = sqrt(.75)*a;
 
-      // -001
+      // [-1-11]/2 = -001
       niv[3*5+0] = +0;  niv[3*5+1] = +0;  niv[3*5+2] = -1;
-      nnv[3*5+0] = 0.0; nnv[3*5+1] = 0.0; nnv[3*5+2] = -a;
-    } else {
-      a *= sqrt(2.0); // a -> a'
-      // fcc x,y,z =  a'/2[110],a'/2[011],a'/2[101] , a' = a*sqrt(2)
+      nnv[3*5+0] = -a/2.0;  nnv[3*5+1] = -a/2.0;  nnv[3*5+2] = +a/2.0;
+      nm[5] = sqrt(.75)*a;
 
-      //-----
+      // [111]/2 = -111 + 1-11 + 11-1 = 1 1 1
+      niv[3*6+0] = +1;  niv[3*6+1] = +1;  niv[3*6+2] = +1;
+      nnv[3*6+0] = +a/2.0;  nnv[3*6+1] = +a/2.0;  nnv[3*6+2] = +a/2.0;
+      nm[6] = sqrt(.75)*a;
+
+      // -[111]/2 = 1-1-1 + -11-1 + -1-11 = -1 -1 -1
+      niv[3*7+0] = -1;  niv[3*7+1] = -1;  niv[3*7+2] = -1;
+      nnv[3*7+0] = -a/2.0;  nnv[3*7+1] = -a/2.0;  nnv[3*7+2] = -a/2.0;
+      nm[7] = sqrt(.75)*a;
+
+      // [100] = [1-1-1]/2 + [111]/2 = 0 1 1
+      niv[3*8+0] = +0;  niv[3*8+1] =  +1;  niv[3*8+2] =  +1;
+      nnv[3*8+0] = +a;  nnv[3*8+1] = 0.0;  nnv[3*8+2] = 0.0;
+      nm[8] = a;
+
+      // [-100] = -[1-1-1]/2 - [111]/2 = 0 -1 -1
+      niv[3*9+0] = +0;  niv[3*9+1] =  -1;  niv[3*9+2] =  -1;
+      nnv[3*9+0] = -a;  nnv[3*9+1] = 0.0;  nnv[3*9+2] = 0.0;
+      nm[9] = a;
+
+      // [010] = [-11-1]/2 + [111]/2 = 1 0 1
+      niv[3*10+0] =  +1;  niv[3*10+1] =  +0;  niv[3*10+2] =  +1;
+      nnv[3*10+0] = 0.0;  nnv[3*10+1] =  +a;  nnv[3*10+2] = 0.0;
+      nm[10] = a;
+
+      // [-100] = -[-11-1]/2 - [111]/2 = -1 0 -1
+      niv[3*11+0] = -1;   niv[3*11+1] =  +0;  niv[3*11+2] =  -1;
+      nnv[3*11+0] = 0.0;  nnv[3*11+1] = -a;   nnv[3*11+2] = 0.0;
+      nm[11] = a;
+
+      // [001] = [-1-11]/2 + [111]/2 = 1 1 0
+      niv[3*12+0] =  +1;  niv[3*12+1] =  +1;  niv[3*12+2] =  +0;
+      nnv[3*12+0] = 0.0;  nnv[3*12+1] =  0.0;  nnv[3*12+2] = +a;
+      nm[12] = a;
+
+      // [00-1] = -[1-1-1]/2 - [111]/2 = -1 -1 0
+      niv[3*13+0] = -1;   niv[3*13+1] =  -1;  niv[3*13+2] =  +0;
+      nnv[3*13+0] = 0.0;  nnv[3*13+1] = 0.0;   nnv[3*13+2] = -a;
+      nm[13] = a;
+
+    } else {
+
       // [110] == 100
       niv[3*0+0] = +1;      niv[3*0+1] = +0;     niv[3*0+2] = +0;
       nnv[3*0+0] =  a/2.0; nnv[3*0+1] = a/2.0; nnv[3*0+2] = 0.0;
+      nm[0] = a/sqrt(2.0);
+
       // [-1-10] == -100
       niv[3*1+0] = -1;      niv[3*1+1] = +0;      niv[3*1+2] = +0;
       nnv[3*1+0] = -a/2.0; nnv[3*1+1] = -a/2.0; nnv[3*1+2] = 0.0;
+      nm[1] = a/sqrt(2.0);
+
       // [1-10] = [101]-[011] == 0-11
       niv[3*2+0] = 0;       niv[3*2+1] = -1;      niv[3*2+2] = +1;
       nnv[3*2+0] =  a/2.0; nnv[3*2+1] = -a/2.0; nnv[3*2+2] = 0.0;
+      nm[2] = a/sqrt(2.0);
+
       // [-110] == 01-1
       niv[3*3+0] = 0;       niv[3*3+1] = 1;      niv[3*3+2] = -1;
       nnv[3*3+0] = -a/2.0; nnv[3*3+1] = a/2.0; nnv[3*3+2] = 0.0;
+      nm[3] = a/sqrt(2.0);
 
-      //-----
       // [011] == 010
       niv[3*4+0] = 0;    niv[3*4+1] = +1;     niv[3*4+2] = +0;
       nnv[3*4+0] =  0.0; nnv[3*4+1] = a/2.0; nnv[3*4+2] = a/2.0;
+      nm[4] = a/sqrt(2.0);
+
       // [0-1-1] == 0-10
       niv[3*5+0] = 0;   niv[3*5+1] = -1;      niv[3*5+2] = +0;
       nnv[3*5+0] = 0.0; nnv[3*5+1] = -a/2.0; nnv[3*5+2] = -a/2.0;
+      nm[5] = a/sqrt(2.0);
+
       // [0-11] = [101]-[110] = -101
       niv[3*6+0] = -1;   niv[3*6+1] = 0;       niv[3*6+2] = 1;
       nnv[3*6+0] =  0.0; nnv[3*6+1] = -a/2.0; nnv[3*6+2] = a/2.0;
+      nm[6] = a/sqrt(2.0);
+
       // [01-1] == 10-1
       niv[3*7+0] = 1;   niv[3*7+1] = +0;     niv[3*7+2] = -1;
       nnv[3*7+0] = 0.0; nnv[3*7+1] = a/2.0; nnv[3*7+2] = -a/2.0;
+      nm[7] = a/sqrt(2.0);
 
-      //-----
       // [101] == 001
       niv[3*8+0] = 0;       niv[3*8+1] = +0;  niv[3*8+2] = +1;
       nnv[3*8+0] =  a/2.0; nnv[3*8+1] = 0.0; nnv[3*8+2] = a/2.0;
+      nm[8] = a/sqrt(2.0);
+
       // [-10-1] == 00-1
       niv[3*9+0] = 0;       niv[3*9+1] = +0;  niv[3*9+2] = -1;
       nnv[3*9+0] = -a/2.0; nnv[3*9+1] = 0.0; nnv[3*9+2] = -a/2.0;
+      nm[9] = a/sqrt(2.0);
+
       // [10-1] = [110] - [011] == 1-10
       niv[3*10+0] = +1;      niv[3*10+1] = -1;  niv[3*10+2] = +0;
       nnv[3*10+0] =  a/2.0; nnv[3*10+1] = 0.0; nnv[3*10+2] = -a/2.0;
+      nm[10] = a/sqrt(2.0);
+
       // [-101] = -[110] + [011] == -110
       niv[3*11+0] = -1;      niv[3*11+1] = +1;  niv[3*11+2] = +0;
       nnv[3*11+0] = -a/2.0; nnv[3*11+1] = 0.0; nnv[3*11+2] = a/2.0;
-
-      a /= sqrt(2.0);  // a' -> a
+      nm[11] = a/sqrt(2.0);
     }
 
     // could hard code this, but find all pairs with dp == a^2/2
@@ -179,7 +247,7 @@ extern "C" {
           dp = nnv[3*i+0]*nnv[3*j+0]/a/a;
           dp += nnv[3*i+1]*nnv[3*j+1]/a/a;
           dp += nnv[3*i+2]*nnv[3*j+2]/a/a;
-          if(dp>0.49 && dp<0.51) {
+          if( std::fabs(dp-CorrelationTarget) < 0.01 ) {
             blp[4*i+t] = j;
             t++;
           }
@@ -204,11 +272,8 @@ extern "C" {
     }
 
     for(i=0;i<6;i++) V[bins+i]=0.0;
-    //if(rank==0)
-    //  std::cout<<"V_bond(<b>)/[Energy]: "<<energy(D,AL,RT,a0,a,0.0)<<std::endl;
 
     int ib,ib2,ib3,ib4,correction_count=0,ix,iy,iz,nix,niy,niz;
-    //double theta,phi;
     double ig = 0.001,blm,btm,bmd,cc;
     double iG = sqrt(2.0*T*ig);
     double mf=0.0,bv[3],bt[3],abv[3],nv[3],flt[2],bm,fm,et,el,blmax=0.0,blmin=2.0;
@@ -222,7 +287,6 @@ extern "C" {
         iy = (i/N)%N;
         iz = i/(N*N);
 
-
         fv[3*i+0] = 0.0;
         fv[3*i+1] = 0.0;
         fv[3*i+2] = 0.0;
@@ -232,11 +296,11 @@ extern "C" {
 
           // bv = x[ni] - x[i] + b0
           nix = (ix+niv[3*j+0]+N)%N;
+
           //bc[0] = (ix+niv[3*j+0])==nix;
-
           niy = (iy+niv[3*j+1]+N)%N;
-          //bc[1] = (iy+niv[3*j+1])==niy;
 
+          //bc[1] = (iy+niv[3*j+1])==niy;
           niz = (iz+niv[3*j+2]+N)%N;
           //bc[2] = (iz+niv[3*j+2])==niz;
 
@@ -249,9 +313,9 @@ extern "C" {
           bmd = sqrt(bv[0]*bv[0]+bv[1]*bv[1]+bv[2]*bv[2]);
 
           // this is unit a_0, i.e. nv = a_0 / |a_0|, where |a_0| = am
-          nv[0] = nnv[3*j+0]/a;
-          nv[1] = nnv[3*j+1]/a;
-          nv[2] = nnv[3*j+2]/a;
+          nv[0] = nnv[3*j+0]/nm[j];
+          nv[1] = nnv[3*j+1]/nm[j];
+          nv[2] = nnv[3*j+2]/nm[j];
 
           // this is x_ni - x_i
           abv[0] = bv[0] + nnv[3*j+0];
@@ -279,11 +343,13 @@ extern "C" {
           ib4 = int(bins*(btm/(max_r-min_r))); // transverse, no offset
 
           if(t>=ttherm && ib>=0 && ib<bins) H[ib]++; // mag, double counting
+
           if(t>=ttherm && ib2>=0 && ib2<bins) {
             H[ib2+bins]++; // proj, double counting
             if(CorrelationType>1) blc[j] = ib2;
             if(CorrelationType>0 && ib4>=0 && ib4<bins) CH[ib2*bins+ib4]++;
           }
+
           if(t>=ttherm && ib3>=0 && ib3<bins) H[ib3+2*bins]++; // diff, double counting
           if(t>=ttherm && ib4>=0 && ib4<bins) H[ib4+3*bins]++; // trans, double counting
 
@@ -292,7 +358,7 @@ extern "C" {
            -d/dx_i V(|x_n-x_i|) = dV * (x_n-x_i)/|x_n-x_i| -> 2.0*D*AL*AL*(x_n-x_i)
           */
           if(CentralForce) {
-            el = energy(D,AL,a0,bm)-energy(D,AL,a0,a);
+            el = energy(D,AL,nm[j]/sc,bm)-energy(D,AL,nm[j]/sc,nm[j]);
             et = RT*D*AL*AL*btm*btm;
             fm = denergy(D,AL,a0,bm);
             fv[3*i+0] += abv[0] / bm * fm - 2.0*RT*D*AL*AL*bt[0];
@@ -300,9 +366,9 @@ extern "C" {
             fv[3*i+2] += abv[2] / bm * fm - 2.0*RT*D*AL*AL*bt[2];
             fm = sqrt(fm*fm+RT*D*AL*AL*et*4.0);
           } else {
-            el = energy_long(D,AL,RT,a0,blm)-energy_long(D,AL,RT,a0,a);
-            et = energy_tran(D,AL,RT,a0,btm);
-            fm = force(D,AL,RT,a0,blm,btm,flt);
+            el = energy_long(D,AL,RT,nm[j]/sc,blm)-energy_long(D,AL,RT,nm[j]/sc,nm[j]);
+            et = energy_tran(D,AL,RT,nm[j]/sc,btm);
+            fm = force(D,AL,RT,nm[j]/sc,blm,btm,flt);
             fv[3*i+0] += -nv[0]*flt[0] - bt[0]*flt[1];
             fv[3*i+1] += -nv[1]*flt[0] - bt[1]*flt[1];
             fv[3*i+2] += -nv[2]*flt[0] - bt[2]*flt[1];
