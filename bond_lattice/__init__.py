@@ -9,7 +9,7 @@ from scipy.special import iv,erf
 class bond_lattice:
     def __init__(self,D=1.0,AL=1.0,RT=0.0,a0=1.0,N=6,\
         min_r=-0.5,max_r=4.5,bins=501,am=1.0,steps=1000,therm_steps=500,\
-        seed=40,rank=0,fcc=True,CorrelationType=0,CentralForce=False,libname="libmcsim"):
+        seed=40,rank=0,LatticeType=0,CorrelationType=0,CentralForce=False,libname="libmcsim"):
         """relative path to shared library"""
         self.lib_path = glob.glob(os.path.join(os.path.dirname(__file__), libname + "*.*so"))[-1]
         self.mclib = cdll.LoadLibrary(self.lib_path)
@@ -21,7 +21,7 @@ class bond_lattice:
         self.seed = seed
         self.steps = steps
         self.therm_steps = therm_steps
-        self.fcc = fcc
+        self.LatticeType = LatticeType
         self.CorrelationType = CorrelationType #
         self.rank = rank
         self.max_r = max_r
@@ -51,13 +51,20 @@ class bond_lattice:
         return solver.x
 
     def run(self,am=1.0,T=0.1):
-        H = np.zeros(4*self.bins,np.int32)
+        if self.LatticeType <2:
+            H = np.zeros(4*self.bins,np.int32)
+        else:
+            H = np.zeros(4*self.bins,np.int32)
+
         if self.CorrelationType==1:
-            CH = np.zeros(self.bins*self.bins,np.int32)
-        elif self.CorrelationType==2:
-            CH = np.zeros(4*self.bins*self.bins,np.int32)
+            if self.LatticeType<2:
+                CH = np.zeros(4*self.bins*self.bins,np.int32)
+            else:
+                CH = np.zeros(6*self.bins*self.bins,np.int32)
         else:
             CH = np.zeros(1,np.int32)
+
+
         V = np.zeros(self.bins+6)
         r = np.zeros(self.bins)
         if self.rank==0:
@@ -69,7 +76,7 @@ class bond_lattice:
         int bins, int *H, double *V, int *CH,
         double *r,
         unsigned seed, int SAMPLE, int THERM, int rank,
-        bool fcc,
+        int LatticeType,
         int CorrelationType, bool CentralForce)
         """
         self.mclib.simpos3D.argtypes = [c_double, c_double, c_int,\
@@ -79,8 +86,7 @@ class bond_lattice:
         ndpointer(c_double, flags="C_CONTIGUOUS"),\
         ndpointer(c_int32, flags="C_CONTIGUOUS"),\
         ndpointer(c_double, flags="C_CONTIGUOUS"),\
-        c_uint,c_int,c_int,c_int,c_bool,c_int32,c_bool]
-        print(self.fcc,self.CorrelationType,self.CentralForce)
+        c_uint,c_int,c_int,c_int,c_int32,c_int32,c_bool]
         self.mclib.simpos3D.restypes = None
         self.mclib.simpos3D(self.a0,am,self.N,\
                   self.AL,self.D,self.RT,T,\
@@ -89,7 +95,7 @@ class bond_lattice:
                   H,V,CH,r,\
                   self.seed,self.steps,\
                   self.therm_steps,self.rank,\
-                  self.fcc,self.CorrelationType,self.CentralForce)
+                  self.LatticeType,self.CorrelationType,self.CentralForce)
 
         if self.CorrelationType>0:
             return r,H,V,CH

@@ -29,6 +29,7 @@ STEPS = input_data['md']['steps']
 D0 = input_data['potential']['D0']
 a0 = input_data['potential']['a0']
 AL = input_data['potential']['AL']
+LatticeType = input_data['potential']['LatticeType']
 rlim = [input_data['potential']['r_min'], input_data['potential']['r_max']]
 am_array = input_data['am_array']
 T_array = input_data['t_array']
@@ -84,15 +85,15 @@ CorrelationType = 2 : += b_para joint dist. for (l,l+7) and (l,l+1)
 CorrelationType > 0 can give quite large files, GB of data in a batch
 """
 
-CorrelationType = 2 * input_data["JointHist"]
+CorrelationType = input_data["JointHist"]
 
 for ji in np.arange(jl[color],jl[color+1]):
 	am,RT,T = am_RT_T_array[ji]
-	sim_pbc = bond_lattice(a0=a0,D=D0,AL=AL,RT=RT,N=N,fcc=False,CorrelationType=CorrelationType,\
+	sim_pbc = bond_lattice(a0=a0,D=D0,AL=AL,RT=RT,N=N,LatticeType=LatticeType,CorrelationType=CorrelationType,\
 			min_r=rlim[0],max_r=rlim[1],\
 			bins=bins,am=1.0,steps=STEPS,therm_steps=THERM,seed=seed+rank,rank=rank,\
 			CentralForce=False)
-	dump_string = "N%d_S%dk_RT%f_T%f_a%f_%s" % (N,STEPS//1000,RT,T,am,potname)
+	dump_string = "L%d_N%d_S%dk_RT%f_T%f_a%f_%s" % (LatticeType,N,STEPS//1000,RT,T,am,potname)
 
 	# collect data from each worker
 	if CorrelationType>0:

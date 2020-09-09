@@ -1,3 +1,6 @@
 .snakemake/*
 bond_lattice/*o
 bond_lattice/__pycache__/*
+run2/*
+analyze/.ipynb_checkpoints/*
+run/*

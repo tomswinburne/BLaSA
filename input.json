@@ -1,21 +1,22 @@
 {
     "dump_folder" : "sample_data",
-    "workers_per_value": 10,
+    "workers_per_value": 1,
     "md": {
-        "bins": 4501,
-        "n": 12,
-        "therm": 50000,
-        "steps": 50000
+        "bins": 501,
+        "n": 8,
+        "therm": 10000,
+        "steps": 10000
     },
     "potential": {
         "D0": 0.1,
         "a0": 2.856,
         "AL": 1.5,
         "r_min": 0.0,
-        "r_max": 7.4
+        "r_max": 7.4,
+        "LatticeType" : 2
     },
-    "am_array": [1.0, 1.04],
-    "t_array": [100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0],
-    "RT_array": [0.0, 0.2],
-    "JointHist": 0
+    "am_array": [1.0],
+    "t_array": [400.0],
+    "RT_array": [0.1],
+    "JointHist": 1
 }
